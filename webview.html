@@ -15,8 +15,6 @@
         #container {
             height: 100%;
             width: 100%;
-            margin: 0;
-            padding: 0;
         }
     </style>
 </head>
@@ -27,10 +25,23 @@
     <script>
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' }});
         require(['vs/editor/editor.main'], function() {
+            monaco.editor.defineTheme('custom-dark', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                    { token: 'comment', foreground: '7C7C7C' },
+                    { token: 'keyword', foreground: 'FF0000' },
+                    { token: 'string', foreground: '00FF00' }
+                ],
+                colors: {
+                    'editor.background': '#141414'
+                }
+            });
+
             monaco.editor.create(document.getElementById('container'), {
                 value: '-- Write your Lua code here...',
                 language: 'lua',
-                theme: 'vs-dark'
+                theme: 'custom-dark'
             });
         });
 
