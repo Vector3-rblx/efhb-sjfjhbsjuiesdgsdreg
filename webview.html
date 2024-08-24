@@ -9,11 +9,14 @@
             margin: 0;
             padding: 0;
             height: 100%;
+            width: 100%;
             overflow: hidden;
         }
         #container {
             height: 100%;
             width: 100%;
+            margin: 0;
+            padding: 0;
         }
     </style>
 </head>
@@ -21,24 +24,22 @@
     <div id="container"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/loader.js"></script>
-   <script>
-    let editor;
-
-    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' }});
-    require(['vs/editor/editor.main'], function() {
-        editor = monaco.editor.create(document.getElementById('container'), {
-            value: '-- Write your Lua code here...',
-            language: 'lua',
-            theme: 'vs-dark'
+    <script>
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            monaco.editor.create(document.getElementById('container'), {
+                value: '-- Write your Lua code here...',
+                language: 'lua',
+                theme: 'vs-dark'
+            });
         });
-    });
 
-    function clearEditor() {
-        if (editor) {
-            editor.setValue('');
+        function clearEditor() {
+            const editor = monaco.editor.getModels()[0];
+            if (editor) {
+                editor.setValue('');
+            }
         }
-    }
-</script>
-
+    </script>
 </body>
 </html>
