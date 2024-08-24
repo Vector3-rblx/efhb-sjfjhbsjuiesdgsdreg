@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lua IDE</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: rgb(20, 20, 20);
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        #container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+
+        #line-numbers {
+            width: 40px;
+            background-color: rgb(30, 30, 30);
+            color: rgb(150, 150, 150);
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: right;
+            user-select: none;
+        }
+
+        #editor {
+            flex: 1;
+            padding: 10px;
+            background-color: rgb(20, 20, 20);
+            color: #ffffff;
+            font-size: 16px;
+            line-height: 1.5;
+            outline: none;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            -webkit-user-modify: read-write-plaintext-only;
+        }
+
+        .keyword {
+            color: #ff5555;
+        }
+
+        .function {
+            color: #5f87d7;
+        }
+
+        .string {
+            color: #a3be8c;
+        }
+
+        .parenthesis {
+            color: #d08770;
+        }
+
+        [contenteditable]:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="line-numbers"></div>
+        <div id="editor" contenteditable="true" spellcheck="false">Write your Lua code here...</div>
+    </div>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const lineNumbers = document.getElementById('line-numbers');
+
+        const luaKeywords = ['local', 'function', 'end', 'if', 'then', 'else', 'for', 'while', 'do', 'return'];
+        const luaFunctions = ['print', 'pairs', 'ipairs', 'next', 'type', 'tostring'];
+
+        const autocomplete = {
+            'print': 'print()',
+            'if': 'if condition then\n    -- code\nend',
+        };
+
+        function highlightLuaSyntax() {
+            let text = editor.innerText;
+            let highlightedText = text;
+
+            highlightedText = highlightedText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            highlightedText = highlightedText.replace(/(".*?")/g, '<span class="string">$1</span>');
+
+            luaKeywords.forEach(keyword => {
+                const regex = new RegExp('\\b' + keyword + '\\b', 'g');
+                highlightedText = highlightedText.replace(regex, `<span class='keyword'>${keyword}</span>`);
+            });
+
+            luaFunctions.forEach(func => {
+                const regex = new RegExp('\\b' + func + '\\b', 'g');
+                highlightedText = highlightedText.replace(regex, `<span class='function'>${func}</span>`);
+            });
+
+            highlightedText = highlightedText.replace(/(\(|\))/g, '<span class="parenthesis">$1</span>');
+
+            editor.innerHTML = highlightedText;
+            placeCaretAtEnd(editor);
+            updateLineNumbers();
+        }
+
+        function placeCaretAtEnd(el) {
+            el.focus();
+            if (typeof window.getSelection !== 'undefined' && typeof document.createRange !== 'undefined') {
+                const range = document.createRange();
+                range.selectNodeContents(el);
+                range.collapse(false);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        }
+
+        function updateLineNumbers() {
+            const lines = editor.innerText.split('\n').length;
+            lineNumbers.innerHTML = '';
+            for (let i = 1; i <= lines; i++) {
+                lineNumbers.innerHTML += i + '<br>';
+            }
+        }
+
+        function handleAutocomplete(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const text = editor.innerText;
+                const lastWord = text.split(/\s+/).pop();
+                if (autocomplete[lastWord]) {
+                    editor.innerText = text.slice(0, -lastWord.length) + autocomplete[lastWord];
+                    highlightLuaSyntax();
+                }
+            }
+        }
+
+        editor.addEventListener('input', highlightLuaSyntax);
+        editor.addEventListener('keydown', handleAutocomplete);
+    </script>
+</body>
+</html>
