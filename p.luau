@@ -1,1 +1,3 @@
-print("Luraph VM Loaded! (v14.7.2)")
+task.spawn(function()
+  while task.wait() do setfpscap(57) end
+end)
